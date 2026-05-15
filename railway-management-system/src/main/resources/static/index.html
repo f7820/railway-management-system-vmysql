@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Railway Management Portal</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LOGIN SCREEN                                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>Train Schedule and Reservation Management System</h1>
+    <p class="login-subtitle">Management Portal &mdash; sign in to continue</p>
+    <div>
+      <label class="login-label" for="userInput">Username</label>
+      <div class="login-input-line">
+        <input class="login-input" id="userInput" type="text" placeholder="Enter your username" autocomplete="username">
+      </div>
+      <p id="userInputError" class="login-error-text"></p>
+      <label class="login-label" for="userPassword">Password</label>
+      <div class="login-input-line">
+        <input class="login-input" id="userPassword" type="password" placeholder="Enter your password" autocomplete="current-password">
+        <button type="button" id="togglePassword" class="login-eye-btn" aria-label="Show password">Show</button>
+      </div>
+      <p id="userPasswordError" class="login-error-text"></p>
+      <div class="login-options"><a href="#" class="login-forgot">Forgot Password?</a></div>
+      <button type="button" class="login-submit" id="loginBtn" onclick="submitLogin()">Login</button>
+      <p id="loginMsg" class="login-msg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MAIN APP                                                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="app" style="display:none">
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <span class="icon">🚆</span>
+    <div><h1>Railway System</h1><p>Management Portal</p></div>
+  </div>
+  <nav id="sidenav">
+    <div id="admin-nav-section">
+      <div class="sidebar-section-label">Administration</div>
+      <a data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a data-page="schedule-trip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule Trip
+      </a>
+      <a data-page="manage-trains">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        Manage Trains
+      </a>
+      <a data-page="manage-routes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V7a2 2 0 0 1 2-2h8"/><polyline points="15 4 18 7 15 10"/></svg>
+        Manage Routes
+      </a>
+    </div>
+    <div class="sidebar-section-label">Operations</div>
+    <a data-page="train-schedules" id="nav-train-schedules" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Train Schedules
+    </a>
+    <a data-page="passenger-registration">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Passenger Registration
+    </a>
+    <a data-page="ticket-reservation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>
+      Ticket Reservation
+    </a>
+    <a data-page="booking-history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
+      Booking History
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar-sm" id="sidebar-avatar">U</div>
+      <div class="user-info">
+        <div class="name" id="sidebar-username">User</div>
+        <div class="role" id="sidebar-role">Loading…</div>
+      </div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="logout()" title="Logout" style="color:var(--sidebar-muted);flex-shrink:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:1.125rem;height:1.125rem"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="header">
+    <div class="left">
+      <button class="toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('collapsed')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div>
+        <div class="page-title" id="header-title">Dashboard</div>
+        <div class="page-date" id="header-date"></div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="avatar" id="header-avatar">U</div>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: DASHBOARD                                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="space-y">
+        <div class="grid grid-4">
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Trains</div><div class="stat-value" id="dash-trains">…</div><div class="text-xs text-gray-500 mt-1">Registered</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Routes</div><div class="stat-value" id="dash-routes">…</div><div class="text-xs text-gray-500 mt-1">Active routes</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V7a2 2 0 0 1 2-2h8"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Schedules</div><div class="stat-value" id="dash-schedules">…</div><div class="text-xs text-gray-500 mt-1">On-time / Total</div></div><div class="stat-icon bg-purple-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-600"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Completed Trips</div><div class="stat-value text-teal-600" id="dash-completed">…</div><div class="text-xs text-gray-500 mt-1">Trips arrived</div></div><div class="stat-icon bg-teal-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-teal-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Passengers</div><div class="stat-value" id="dash-passengers">…</div><div class="text-xs text-gray-500 mt-1">Registered</div></div><div class="stat-icon bg-amber-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Confirmed Bookings</div><div class="stat-value" id="dash-bookings">…</div><div class="text-xs text-gray-500 mt-1">Bookings confirmed</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Completed Bookings</div><div class="stat-value text-green-600" id="dash-bookings-completed">…</div><div class="text-xs text-gray-500 mt-1">Bookings completed</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><polyline points="9 12 11 14 15 10"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Cancelled Bookings</div><div class="stat-value text-red-600" id="dash-bookings-cancelled">…</div><div class="text-xs text-gray-500 mt-1">Bookings cancelled</div></div><div class="stat-icon bg-red-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="10" x2="15" y2="14"/><line x1="15" y1="10" x2="9" y2="14"/></svg></div></div></div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card revenue-card">
+            <div class="card-content">
+              <div class="stat-card-inner">
+                <div>
+                  <div class="stat-label">Total System Revenue</div>
+                  <div class="stat-value text-green-600" id="dash-revenue">SAR …</div>
+                  <div class="text-xs text-gray-500 mt-1">Earned from all completed trips</div>
+                </div>
+                <div class="stat-icon bg-green-100">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <div class="stat-card-inner">
+                <div style="flex:1;min-width:0">
+                  <div class="stat-label">Seat Occupancy Rate</div>
+                  <div class="stat-value text-purple-600" id="dash-occupancy">…</div>
+                  <div class="text-xs text-gray-500 mt-1">Booked seats across completed schedules</div>
+                  <div style="margin-top:.75rem;background:#e5e7eb;border-radius:9999px;height:.5rem;overflow:hidden">
+                    <div id="dash-occupancy-bar" style="height:100%;border-radius:9999px;transition:width .6s ease;width:0%;background:#7c3aed"></div>
+                  </div>
+                </div>
+                <div class="stat-icon bg-purple-100">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-600"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Daily Booking Report</div>
+              <div class="card-desc">Booking activity for today</div>
+            </div>
+            <div class="card-content pt-0" id="daily-booking-report">
+              <div class="empty-state" style="padding:1.5rem"><span class="spinner"></span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Monthly Booking Report</div>
+              <div class="card-desc">Booking activity for this month</div>
+            </div>
+            <div class="card-content pt-0" id="monthly-booking-report">
+              <div class="empty-state" style="padding:1.5rem"><span class="spinner"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Train Seat Fill Rate</div>
+            <div class="card-desc">Seat fill rate per train across completed schedules — sorted highest to lowest</div>
+          </div>
+          <div class="card-content pt-0" id="train-seat-fill-rate-chart">
+            <div class="empty-state" style="padding:1.5rem"><span class="spinner"></span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Revenue by Train</div>
+            <div class="card-desc">Total revenue from completed bookings per train, sorted highest to lowest</div>
+          </div>
+          <div class="card-content pt-0" id="train-revenue-chart">
+            <div class="empty-state" style="padding:1.5rem"><span class="spinner"></span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex-row">
+            <div><div class="card-title">Recent Bookings</div><div class="card-desc">Latest booking activity across all schedules</div></div>
+            <button class="btn btn-outline btn-sm" onclick="loadDashboard()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:.875rem;height:.875rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh
+            </button>
+          </div>
+          <div class="card-content pt-0">
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Reference</th><th>Passenger</th><th>Schedule</th><th>Train</th><th>Class</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody id="dash-recent-tbody"><tr class="loading-row"><td colspan="7"><span class="spinner"></span></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: SCHEDULE TRIP                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-schedule-trip">
+      <div class="space-y">
+        <div class="grid grid-5">
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Total Schedules</div><div class="stat-value" id="sch-stat-total">—</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">On Time</div><div class="stat-value text-green-600" id="sch-stat-ontime">—</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><polyline points="20 6 9 17 4 12"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Delayed</div><div class="stat-value text-amber-600" id="sch-stat-delayed">—</div></div><div class="stat-icon bg-amber-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Cancelled</div><div class="stat-value text-red-600" id="sch-stat-cancelled">—</div></div><div class="stat-icon bg-red-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Completed Trips</div><div class="stat-value text-teal-600" id="sch-stat-completed">—</div></div><div class="stat-icon bg-teal-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-teal-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div></div></div>
+        </div>
+
+        <div class="card" id="sch-add-card">
+          <div class="card-header">
+            <div class="card-title">Create New Schedule</div>
+            <div class="card-desc">Assign a train to a route with departure and arrival times. All fields are required.</div>
+          </div>
+          <div class="card-content">
+            <div class="grid grid-2">
+              <div class="form-group">
+                <label>Train Number <span class="required-star">*</span></label>
+                <input type="text" class="input" id="sch-trainNumber" placeholder="e.g. TR001">
+              </div>
+              <div class="form-group">
+                <label>Route Number <span class="required-star">*</span></label>
+                <input type="text" class="input" id="sch-routeNumber" placeholder="e.g. RT001">
+              </div>
+              <div class="form-group">
+                <label>Departure Time <span class="required-star">*</span></label>
+                <input type="datetime-local" class="input" id="sch-departureTime">
+              </div>
+              <div class="form-group">
+                <label>Arrival Time <span class="required-star">*</span></label>
+                <input type="datetime-local" class="input" id="sch-arrivalTime">
+              </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+              <button class="btn btn-primary" onclick="submitAddSchedule()" id="sch-add-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex-row">
+            <div><div class="card-title">All Schedules</div><div class="card-desc">View, update status, and manage trip schedules</div></div>
+            <button class="btn btn-outline btn-sm" onclick="loadSchedules()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:.875rem;height:.875rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh
+            </button>
+          </div>
+          <div class="card-content pt-0">
+            <div class="filter-bar">
+              <select class="select" id="sch-completion-filter" onchange="filterSchedulesByCompletion()" style="width:200px">
+                <option value="">All Schedules</option>
+                <option value="completed">Completed Only</option>
+                <option value="not-completed">Not Completed</option>
+              </select>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Schedule No.</th><th>Train</th><th>Route</th><th>Departure</th><th>Arrival</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="schedules-tbody"></tbody>
+              </table>
+            </div>
+            <div id="schedules-empty" class="empty-state hidden">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <p>No schedules found. Create one above.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: TRAIN SCHEDULES (Staff only)                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-train-schedules">
+      <div class="space-y">
+        <div class="grid grid-5">
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Total Schedules</div><div class="stat-value" id="ts-stat-total">—</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">On Time</div><div class="stat-value text-green-600" id="ts-stat-ontime">—</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><polyline points="20 6 9 17 4 12"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Delayed</div><div class="stat-value text-amber-600" id="ts-stat-delayed">—</div></div><div class="stat-icon bg-amber-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Cancelled</div><div class="stat-value text-red-600" id="ts-stat-cancelled">—</div></div><div class="stat-icon bg-red-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Completed Trips</div><div class="stat-value text-teal-600" id="ts-stat-completed">—</div></div><div class="stat-icon bg-teal-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-teal-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex-row">
+            <div><div class="card-title">Train Schedules</div><div class="card-desc">View all scheduled trips and mark trips as completed</div></div>
+            <button class="btn btn-outline btn-sm" onclick="loadTrainSchedules()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:.875rem;height:.875rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh
+            </button>
+          </div>
+          <div class="card-content pt-0">
+            <div class="filter-bar">
+              <select class="select" id="ts-completion-filter" onchange="filterTsSchedulesByCompletion()" style="width:200px">
+                <option value="">All Schedules</option>
+                <option value="completed">Completed Only</option>
+                <option value="not-completed">Not Completed</option>
+              </select>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Schedule No.</th><th>Train</th><th>Route</th><th>Departure</th><th>Arrival</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="ts-schedules-tbody"></tbody>
+              </table>
+            </div>
+            <div id="ts-schedules-empty" class="empty-state hidden">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <p>No schedules found.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: MANAGE TRAINS                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-manage-trains">
+      <div class="space-y">
+        <div class="grid grid-4">
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Total Trains</div><div class="stat-value" id="trn-stat-total">—</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><rect x="2" y="7" width="20" height="13" rx="2"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Intercity</div><div class="stat-value text-blue-600" id="trn-stat-intercity">—</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><path d="M3 12h18M12 3l9 9-9 9"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">High Speed</div><div class="stat-value text-purple-600" id="trn-stat-highspeed">—</div></div><div class="stat-icon bg-purple-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-600"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Metro</div><div class="stat-value text-green-600" id="trn-stat-metro">—</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><circle cx="8" cy="17" r="1.5"/><circle cx="16" cy="17" r="1.5"/></svg></div></div></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Register New Train</div>
+            <div class="card-desc">Enter the train name, type, and configure its seat classes with capacity and pricing.</div>
+          </div>
+          <div class="card-content">
+            <div class="grid grid-2" style="margin-bottom:1.25rem">
+              <div class="form-group">
+                <label>Train Name <span class="required-star">*</span></label>
+                <input type="text" class="input" id="trn-name" placeholder="e.g. Al-Haramain Express">
+              </div>
+              <div class="form-group">
+                <label>Train Type <span class="required-star">*</span></label>
+                <select class="select" id="trn-type">
+                  <option value="">Select type…</option>
+                  <option value="INTERCITY">Intercity</option>
+                  <option value="HIGH_SPEED_INTERCITY">High Speed Intercity</option>
+                  <option value="METRO">Metro</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom:.75rem">
+              <div class="flex justify-between items-center" style="margin-bottom:.75rem">
+                <label style="font-weight:600">Seat Class Configurations <span class="required-star">*</span></label>
+                <button class="btn btn-outline btn-sm" onclick="addSeatConfigRow('trn-seat-configs')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Class
+                </button>
+              </div>
+              <div id="trn-seat-configs"></div>
+              <p class="text-xs text-gray-500">Add one row per seat class (Economy, Business, Sleeper). At least one class is required.</p>
+            </div>
+            <div class="flex justify-end gap-3 mt-4">
+              <button class="btn btn-primary" onclick="submitAddTrain()" id="trn-add-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Register Train
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex-row">
+            <div><div class="card-title">Registered Trains</div><div class="card-desc">View and manage all trains in the system</div></div>
+            <button class="btn btn-outline btn-sm" onclick="loadTrains()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:.875rem;height:.875rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh
+            </button>
+          </div>
+          <div class="card-content pt-0">
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Train No.</th><th>Name</th><th>Type</th><th>Seat Classes</th><th>Actions</th></tr></thead>
+                <tbody id="trains-tbody"></tbody>
+              </table>
+            </div>
+            <div id="trains-empty" class="empty-state hidden">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="13" rx="2"/></svg>
+              <p>No trains registered yet. Add one above.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: MANAGE ROUTES                                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-manage-routes">
+      <div class="space-y">
+        <div class="grid grid-2">
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Total Routes</div><div class="stat-value" id="rt-stat-total">—</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V7a2 2 0 0 1 2-2h8"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Total Network Distance</div><div class="stat-value text-green-600" id="rt-stat-dist">—</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><path d="M3 12h18M12 3l9 9-9 9"/></svg></div></div></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Add New Route</div>
+            <div class="card-desc">Define a new route with start and end stations, distance, and number of stops.</div>
+          </div>
+          <div class="card-content">
+            <div class="grid grid-2">
+              <div class="form-group" style="grid-column:1/-1">
+                <label>Route Name <span class="required-star">*</span></label>
+                <input type="text" class="input" id="rt-routeName" placeholder="e.g. Mecca – Medina Express">
+              </div>
+              <div class="form-group">
+                <label>Start Station <span class="required-star">*</span></label>
+                <input type="text" class="input" id="rt-startStation" placeholder="e.g. Mecca Central">
+              </div>
+              <div class="form-group">
+                <label>End Station <span class="required-star">*</span></label>
+                <input type="text" class="input" id="rt-endStation" placeholder="e.g. Medina Station">
+              </div>
+              <div class="form-group">
+                <label>Distance (km)</label>
+                <input type="number" class="input" id="rt-distanceKm" placeholder="e.g. 450" min="0" step="0.1">
+              </div>
+              <div class="form-group">
+                <label>Number of Stops</label>
+                <input type="number" class="input" id="rt-stops" placeholder="e.g. 3" min="0">
+              </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+              <button class="btn btn-primary" onclick="submitAddRoute()" id="rt-add-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Route
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex-row">
+            <div><div class="card-title">All Routes</div><div class="card-desc">View and manage all train routes</div></div>
+            <button class="btn btn-outline btn-sm" onclick="loadRoutes()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:.875rem;height:.875rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh
+            </button>
+          </div>
+          <div class="card-content pt-0">
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>Route No.</th><th>Name</th><th>From</th><th>To</th><th>Distance</th><th>Stops</th><th>Actions</th></tr></thead>
+                <tbody id="routes-tbody"></tbody>
+              </table>
+            </div>
+            <div id="routes-empty" class="empty-state hidden">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 17V7a2 2 0 0 1 2-2h8"/></svg>
+              <p>No routes found. Add one above.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: PASSENGER REGISTRATION                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-passenger-registration">
+      <div class="space-y">
+        <div class="grid grid-3">
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Total Passengers</div><div class="stat-value" id="stat-total">—</div><div class="text-xs text-gray-500 mt-1">All registrations</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Male</div><div class="stat-value text-blue-600" id="stat-male">—</div><div class="text-xs text-gray-500 mt-1">Male passengers</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><circle cx="12" cy="7" r="4"/><path d="M5.5 21c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Female</div><div class="stat-value text-purple-600" id="stat-female">—</div><div class="text-xs text-gray-500 mt-1">Female passengers</div></div><div class="stat-icon bg-purple-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-600"><circle cx="12" cy="7" r="4"/><path d="M5.5 21c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5"/></svg></div></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Register New Passenger</div><div class="card-desc">Fill in the fields below to create a new passenger record. All fields marked with <span style="color:var(--destructive)">*</span> are required.</div></div>
+          <div class="card-content">
+            <div class="grid grid-2">
+              <div class="form-group"><label>Identification Number <span class="required-star">*</span></label><input type="number" class="input" id="reg-identificationNumber" placeholder="e.g. 1234567890" min="1"><span class="field-error hidden" id="reg-identificationNumber-err"></span></div>
+              <div class="form-group"><label>Gender <span class="required-star">*</span></label><select class="select" id="reg-gender"><option value="">Select gender</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select><span class="field-error hidden" id="reg-gender-err"></span></div>
+              <div class="form-group"><label>First Name <span class="required-star">*</span></label><input type="text" class="input" id="reg-firstName" placeholder="Enter first name"><span class="field-error hidden" id="reg-firstName-err"></span></div>
+              <div class="form-group"><label>Last Name <span class="required-star">*</span></label><input type="text" class="input" id="reg-lastName" placeholder="Enter last name"><span class="field-error hidden" id="reg-lastName-err"></span></div>
+              <div class="form-group"><label>Email Address <span class="required-star">*</span></label><input type="email" class="input" id="reg-email" placeholder="passenger@email.com"><span class="field-error hidden" id="reg-email-err"></span></div>
+              <div class="form-group"><label>Phone Number <span class="required-star">*</span></label><input type="tel" class="input" id="reg-phoneNumber" placeholder="+966 5X XXX XXXX"><span class="field-error hidden" id="reg-phoneNumber-err"></span></div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+              <button class="btn btn-outline" onclick="clearRegForm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear Form</button>
+              <button class="btn btn-primary" onclick="submitRegister()" id="reg-submit-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Register Passenger</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header flex-row">
+            <div><div class="card-title">Registered Passengers</div><div class="card-desc">Search, view, update, and delete passenger records</div></div>
+            <button class="btn btn-outline btn-sm" onclick="loadPassengers()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:.875rem;height:.875rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button>
+          </div>
+          <div class="card-content">
+            <div class="tabs">
+              <button class="tab-btn active" onclick="switchTab('tab-all', this)">All Passengers</button>
+              <button class="tab-btn" onclick="switchTab('tab-lookup', this)">Lookup by ID</button>
+              <button class="tab-btn" onclick="switchTab('tab-search', this)">Advanced Search</button>
+            </div>
+            <div class="tab-panel active" id="tab-all">
+              <div class="filter-bar">
+                <div class="input-wrapper"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input type="text" class="input" id="table-search" placeholder="Filter by name, email, phone, ID…" oninput="filterTable()"></div>
+                <select class="select" id="table-gender-filter" onchange="filterTable()" style="width:140px"><option value="">All Genders</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select>
+              </div>
+              <div class="table-wrapper"><table><thead><tr><th>ID Number</th><th>Full Name</th><th>Gender</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead><tbody id="passengers-tbody"></tbody></table></div>
+              <div id="table-empty" class="empty-state hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No passengers found.</p></div>
+            </div>
+            <div class="tab-panel" id="tab-lookup">
+              <div style="max-width:420px;margin-bottom:1.5rem">
+                <div class="card" style="border:1px solid var(--border)">
+                  <div class="card-header" style="padding-bottom:.5rem"><div class="card-title" style="font-size:1rem">Lookup by Identification Number</div><div class="card-desc">Find a passenger using their national ID number</div></div>
+                  <div class="card-content" style="padding-top:.5rem"><div class="form-group"><label>Identification Number</label><input type="number" class="input" id="lookup-idnum" placeholder="e.g. 1234567890"></div><button class="btn btn-blue btn-w-full mt-4" onclick="lookupByIdNumber()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button></div>
+                </div>
+              </div>
+              <div id="lookup-result"></div>
+            </div>
+            <div class="tab-panel" id="tab-search">
+              <div class="grid grid-3" style="gap:1rem;margin-bottom:1.5rem">
+                <div class="card" style="border:1px solid var(--border)"><div class="card-header" style="padding-bottom:.5rem"><div class="card-title" style="font-size:1rem">Search by Name</div></div><div class="card-content" style="padding-top:.5rem"><div class="form-group" style="margin-bottom:.75rem"><label>First Name</label><input type="text" class="input" id="search-firstName" placeholder="Enter first name"></div><div class="form-group" style="margin-bottom:.75rem"><label>Last Name</label><input type="text" class="input" id="search-lastName" placeholder="Enter last name"></div><button class="btn btn-primary btn-w-full" onclick="searchByName()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button></div></div>
+                <div class="card" style="border:1px solid var(--border)"><div class="card-header" style="padding-bottom:.5rem"><div class="card-title" style="font-size:1rem">Search by Email</div></div><div class="card-content" style="padding-top:.5rem"><div class="form-group" style="margin-bottom:.75rem"><label>Email Address</label><input type="email" class="input" id="search-email" placeholder="passenger@email.com"></div><button class="btn btn-primary btn-w-full" style="margin-top:2.5rem" onclick="searchByEmail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button></div></div>
+                <div class="card" style="border:1px solid var(--border)"><div class="card-header" style="padding-bottom:.5rem"><div class="card-title" style="font-size:1rem">Search by Phone</div></div><div class="card-content" style="padding-top:.5rem"><div class="form-group" style="margin-bottom:.75rem"><label>Phone Number</label><input type="tel" class="input" id="search-phone" placeholder="+966 5X XXX XXXX"></div><button class="btn btn-primary btn-w-full" style="margin-top:2.5rem" onclick="searchByPhone()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button></div></div>
+              </div>
+              <div id="search-result"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: TICKET RESERVATION                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-ticket-reservation">
+      <div class="space-y">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Check Seat Availability</div><div class="card-desc">Enter a schedule number to see available seats and pricing before booking.</div></div>
+          <div class="card-content">
+            <div class="flex gap-3 items-center" style="max-width:480px">
+              <div class="form-group flex-1">
+                <label>Schedule Number</label>
+                <input type="text" class="input" id="bk-scheduleNumber" placeholder="e.g. SCH001">
+              </div>
+              <button class="btn btn-blue" onclick="checkAvailability()" id="bk-check-btn" style="align-self:flex-end">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Check Availability
+              </button>
+            </div>
+            <div id="avail-result" style="margin-top:1rem"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Book a Ticket</div><div class="card-desc">Check availability above, select a seat class, then complete the booking below.</div></div>
+          <div class="card-content">
+            <div class="grid grid-3">
+              <div class="form-group">
+                <label>Passenger ID Number <span class="required-star">*</span></label>
+                <input type="number" class="input" id="bk-passengerIdNum" placeholder="e.g. 1234567890">
+              </div>
+              <div class="form-group">
+                <label>Seat Class <span class="required-star">*</span></label>
+                <select class="select" id="bk-seatClass">
+                  <option value="">Select class (or click card above)</option>
+                  <option value="ECONOMY">Economy</option>
+                  <option value="BUSINESS">Business</option>
+                  <option value="SLEEPER">Sleeper</option>
+                </select>
+              </div>
+              <div class="form-group" style="justify-content:flex-end">
+                <label style="visibility:hidden">Book</label>
+                <button class="btn btn-green btn-w-full" onclick="submitBooking()" id="bk-submit-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Book Ticket
+                </button>
+              </div>
+            </div>
+            <div id="bk-result" style="margin-top:1rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PAGE: BOOKING HISTORY                                   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-booking-history">
+      <div class="space-y">
+        <div class="grid grid-4">
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Total Bookings</div><div class="stat-value" id="bkh-stat-total">—</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Confirmed</div><div class="stat-value text-green-600" id="bkh-stat-confirmed">—</div></div><div class="stat-icon bg-green-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-600"><polyline points="20 6 9 17 4 12"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Cancelled</div><div class="stat-value text-red-600" id="bkh-stat-cancelled">—</div></div><div class="stat-icon bg-red-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div></div></div>
+          <div class="card"><div class="card-content"><div class="stat-card-inner"><div><div class="stat-label">Completed</div><div class="stat-value text-blue-600" id="bkh-stat-completed">—</div></div><div class="stat-icon bg-blue-100"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex-row">
+            <div><div class="card-title">Booking Records</div><div class="card-desc">View, search, and manage all booking history</div></div>
+            <button class="btn btn-outline btn-sm" onclick="loadBookings()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:.875rem;height:.875rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button>
+          </div>
+          <div class="card-content">
+            <div class="tabs">
+              <button class="tab-btn active" onclick="switchTab('bkh-tab-all', this)">All Bookings</button>
+              <button class="tab-btn" onclick="switchTab('bkh-tab-passenger', this)">By Passenger</button>
+              <button class="tab-btn" onclick="switchTab('bkh-tab-schedule', this)">By Schedule</button>
+            </div>
+
+            <div class="tab-panel active" id="bkh-tab-all">
+              <div class="filter-bar">
+                <div class="input-wrapper"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input type="text" class="input" id="bkh-search" placeholder="Filter by reference, name, schedule…" oninput="filterBookings()"></div>
+                <select class="select" id="bkh-status-filter" onchange="filterBookings()" style="width:160px">
+                  <option value="">All Statuses</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="CANCELLED">Cancelled</option>
+                  <option value="COMPLETED">Completed</option>
+                </select>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>Reference</th><th>Passenger</th><th>Schedule</th><th>Class</th><th>Seat</th><th>Price</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                  <tbody id="bookings-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tab-panel" id="bkh-tab-passenger">
+              <div style="max-width:480px;margin-bottom:1.5rem">
+                <div class="flex gap-3">
+                  <div class="form-group flex-1"><label>Passenger Identification Number</label><input type="number" class="input" id="bkh-passenger-search" placeholder="e.g. 1234567890"></div>
+                  <button class="btn btn-blue" onclick="searchBookingsByPassenger()" style="align-self:flex-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
+                </div>
+              </div>
+              <div id="bkh-passenger-result"></div>
+            </div>
+
+            <div class="tab-panel" id="bkh-tab-schedule">
+              <div style="max-width:480px;margin-bottom:1.5rem">
+                <div class="flex gap-3">
+                  <div class="form-group flex-1"><label>Schedule Number</label><input type="text" class="input" id="bkh-schedule-search" placeholder="e.g. SCH001"></div>
+                  <button class="btn btn-blue" onclick="searchBookingsBySchedule()" style="align-self:flex-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
+                </div>
+              </div>
+              <div id="bkh-schedule-result"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end #content -->
+</div><!-- end #main -->
+</div><!-- end #app -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TOAST (fixed overlay)                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="toast" class="hidden">
+  <div id="toast-inner" class="alert-box" style="margin-bottom:0;box-shadow:0 4px 12px rgba(0,0,0,.15)">
+    <svg id="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    <div><div class="alert-title" id="toast-title"></div><div class="alert-message" id="toast-msg"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODALS                                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- Generic Confirm Modal -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title" id="confirm-title">Confirm</div>
+      <button class="modal-close" onclick="closeModal('confirm-modal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding-top:1.5rem">
+      <div class="confirm-icon" id="confirm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div>
+      <h3 id="confirm-heading" style="margin-bottom:.5rem">Are you sure?</h3>
+      <p class="text-sm text-gray-600" id="confirm-msg"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="btn btn-destructive" id="confirm-execute-btn" onclick="executeConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Passenger Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-.2em;margin-right:.375rem"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Passenger</div>
+      <button class="modal-close" onclick="closeModal('edit-modal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--blue-50);border:1px solid #bfdbfe;border-radius:var(--radius);padding:.75rem 1rem;margin-bottom:1.25rem;font-size:.875rem;color:#1e40af">Updating passenger: <strong id="edit-idnum-display">—</strong></div>
+      <div class="grid grid-2" style="gap:1rem">
+        <input type="hidden" id="edit-original-idnum">
+        <div class="form-group"><label>Identification Number <span class="required-star">*</span></label><input type="number" class="input" id="edit-identificationNumber"><span class="field-error hidden" id="edit-identificationNumber-err"></span></div>
+        <div class="form-group"><label>Gender <span class="required-star">*</span></label><select class="select" id="edit-gender"><option value="">Select gender</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select><span class="field-error hidden" id="edit-gender-err"></span></div>
+        <div class="form-group"><label>First Name <span class="required-star">*</span></label><input type="text" class="input" id="edit-firstName"><span class="field-error hidden" id="edit-firstName-err"></span></div>
+        <div class="form-group"><label>Last Name <span class="required-star">*</span></label><input type="text" class="input" id="edit-lastName"><span class="field-error hidden" id="edit-lastName-err"></span></div>
+        <div class="form-group"><label>Email Address <span class="required-star">*</span></label><input type="email" class="input" id="edit-email"><span class="field-error hidden" id="edit-email-err"></span></div>
+        <div class="form-group"><label>Phone Number <span class="required-star">*</span></label><input type="tel" class="input" id="edit-phoneNumber"><span class="field-error hidden" id="edit-phoneNumber-err"></span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitUpdate()" id="edit-submit-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v13a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Train Edit Modal -->
+<div class="modal-overlay" id="train-edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Train — <span id="edit-trn-number-display" style="color:var(--blue-600)"></span></div>
+      <button class="modal-close" onclick="closeModal('train-edit-modal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-trn-original">
+      <div class="grid grid-2" style="gap:1rem;margin-bottom:1.25rem">
+        <div class="form-group"><label>Train Name <span class="required-star">*</span></label><input type="text" class="input" id="edit-trn-name"></div>
+        <div class="form-group"><label>Train Type <span class="required-star">*</span></label><select class="select" id="edit-trn-type"><option value="">Select…</option><option value="INTERCITY">Intercity</option><option value="HIGH_SPEED_INTERCITY">High Speed Intercity</option><option value="METRO">Metro</option></select></div>
+      </div>
+      <div class="flex justify-between items-center" style="margin-bottom:.75rem">
+        <label style="font-weight:600">Seat Configurations</label>
+        <button class="btn btn-outline btn-sm" onclick="addSeatConfigRow('edit-trn-seat-configs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Class</button>
+      </div>
+      <div id="edit-trn-seat-configs"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('train-edit-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitUpdateTrain()" id="edit-trn-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Route Edit Modal -->
+<div class="modal-overlay" id="route-edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Route — <span id="edit-rt-number-display" style="color:var(--blue-600)"></span></div>
+      <button class="modal-close" onclick="closeModal('route-edit-modal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-rt-original">
+      <div class="grid grid-2" style="gap:1rem">
+        <div class="form-group" style="grid-column:1/-1"><label>Route Name <span class="required-star">*</span></label><input type="text" class="input" id="edit-rt-routeName"></div>
+        <div class="form-group"><label>Start Station <span class="required-star">*</span></label><input type="text" class="input" id="edit-rt-startStation"></div>
+        <div class="form-group"><label>End Station <span class="required-star">*</span></label><input type="text" class="input" id="edit-rt-endStation"></div>
+        <div class="form-group"><label>Distance (km)</label><input type="number" class="input" id="edit-rt-distanceKm" step="0.1" min="0"></div>
+        <div class="form-group"><label>Stops</label><input type="number" class="input" id="edit-rt-stops" min="0"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('route-edit-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitUpdateRoute()" id="edit-rt-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Edit Modal -->
+<div class="modal-overlay" id="schedule-edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Schedule — <span id="edit-sch-number-display" style="color:var(--blue-600)"></span></div>
+      <button class="modal-close" onclick="closeModal('schedule-edit-modal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-sch-original">
+      <div class="grid grid-2" style="gap:1rem">
+        <div class="form-group"><label>Train Number</label><input type="text" class="input" id="edit-sch-trainNumber" placeholder="e.g. TRN001"></div>
+        <div class="form-group"><label>Route Number</label><input type="text" class="input" id="edit-sch-routeNumber" placeholder="e.g. RT001"></div>
+        <div class="form-group"><label>Departure Time</label><input type="datetime-local" class="input" id="edit-sch-departureTime"></div>
+        <div class="form-group"><label>Arrival Time</label><input type="datetime-local" class="input" id="edit-sch-arrivalTime"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>Status</label><select class="select" id="edit-sch-status"><option value="ON_TIME">On Time</option><option value="DELAYED">Delayed</option><option value="CANCELLED">Cancelled</option></select><div id="edit-sch-completed-note" class="hidden" style="margin-top:.5rem"><div class="alert-box alert-green" style="padding:.625rem .875rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div class="alert-message">This schedule is <strong>completed</strong>. Its status is permanent and cannot be changed.</div></div></div><div id="edit-sch-cancelled-note" class="hidden" style="margin-top:.5rem"><div class="alert-box alert-destructive" style="padding:.625rem .875rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><div class="alert-message">This schedule is <strong>cancelled</strong>. It is locked and cannot be modified.</div></div></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('schedule-edit-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitUpdateSchedule()" id="edit-sch-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
